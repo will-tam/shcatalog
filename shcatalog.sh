@@ -88,12 +88,14 @@ ask_dir2scan()
 choose_media_name()
 {
 # Ask for a filename representing the scanned media.
+# $1 = directory to will be scaned.
+  local -r DIR2SCAN="$1"
   local media_name=""
 
   media_name=$(${DIALOG}\
     --output-fd 1\
     --no-collapse\
-    --inputbox "Nom du média à scanner (sans espaces) :" 0 0)
+    --inputbox "Nom du média à scanner (sans espaces) pour ${DIR2SCAN} :" 0 0)
 
   echo "${media_name}"
 }
@@ -132,14 +134,15 @@ search()
   filename=$(${DIALOG}\
     --output-fd 1\
     --no-collapse\
-    --inputbox "Nom entier ou partie du fichier à rechercher (laisser vide pour tout rechercher) :" 0 0)
+    --inputbox "Nom entier ou partie du fichier à rechercher.\n -Distinction min / MAJ\n -Laisser vide pour tout rechercher" 0 0)
 
   [ "x${filename}" == "x" ] && filename="."
 
-  ${CP} /dev/null ${TMP}
-  for l in $(${LS} -1 ${LOCALDIR}/*.db); do ${LOCATE} -d $l ${filename} >> ${TMP}; done
+  echo -e "" > ${TMP}
+  for l in $(${LS} -1 ${LOCALDIR}/*.db); do echo -e "${l} :" >> ${TMP}; ${LOCATE} -d $l ${filename} | sed -e "s/^/    /" >> ${TMP}; echo "" >> ${TMP}; done
+  sed -i '$d' ${TMP}
   ${DIALOG} --no-collapse --textbox ${TMP} 0 0
-  ${CP} /dev/null ${TMP}
+  echo -e "" > ${TMP}
 }
 
 main_menu()
@@ -170,7 +173,7 @@ main_menu()
 
         if [ "x${dir2scan}" != "x" ]
         then
-          media_name="$(choose_media_name)"
+          media_name="$(choose_media_name ${dir2scan})"
           if [ "x${media_name}" = "x" ]
           then
             dialog --output-fd 1 --no-collapse --msgbox "Pas de nom de media : abandon !" 0 0
