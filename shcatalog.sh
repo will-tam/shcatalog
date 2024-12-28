@@ -13,6 +13,7 @@ declare -r TMP="/tmp/shcatalog.log"
 
 declare -r UPDATEDB="/usr/bin/updatedb"
 declare -r LOCATE="/usr/bin/locate"
+declare -r DIALOG="/usr/bin/dialog"
 
 declare -r TRUE="/usr/bin/true"
 declare -r MKDIR="/usr/bin/mkdir"
@@ -23,11 +24,13 @@ declare -r SORT="/usr/bin/sort"
 declare -r GREP="/usr/bin/grep"
 declare -r BASENAME="/usr/bin/basename"
 
-declare -r DIALOG="/usr/bin/dialog"
 
 help_me()
 {
-  echo ""
+  echo -e "\nUtilisation :\n"
+  echo -e "\t\tshcatalog.sh [-h || --help]\n"
+  echo -e "C'est tout!\n"
+  exit 1
 }
 
 die_with()
@@ -200,17 +203,19 @@ main_menu()
 ######### main
 
 # Some package check
-[ ! -x ${UPDATEDB} ] &&  die_with "${UPDATEDB} not found ! Maybe mlocate package is missing.\n" 1
-[ ! -x ${LOCATE} ] &&  die_with "${LOCATE} not found ! Maybe mlocate package is missing.\n" 1
-[ ! -x ${DIALOG} ] &&  die_with "${DIALOG} not found ! Maybe dialog package is missing.\n" 1
+[ ! -x ${UPDATEDB} ] &&  die_with "${UPDATEDB} non trouvé ! Paquet ${YELLOW}mlocate${NORM} manquant ?\n" 1
+[ ! -x ${LOCATE} ] &&  die_with "${LOCATE} non trouvé ! Paquet ${YELLOW}mlocate${NORM} manquant ?\n" 1
+[ ! -x ${DIALOG} ] &&  die_with "${DIALOG} non trouvé ! Paquet ${YELLOW}dialog${NORM} manquant ?\n" 1
 
 # Create using directories if not exist.
 [ ! -d ${CONFDIR} ] && ${MKDIR} -v -p ${CONFDIR}
 [ ! -d ${LOCALDIR} ] && ${MKDIR} -v -p ${LOCALDIR}
 
+[ "$1" == "-h" -o "$1" == "--help" ] && help_me
+
 main_menu
 
-#clear
+clear
 echo "Sortie"
 
 exit 0
