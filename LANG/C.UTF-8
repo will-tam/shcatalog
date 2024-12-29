@@ -1,0 +1,31 @@
+# help_me
+declare -r HELPME1="Usage :\n"
+declare -r HELPME2="\t\tshcatalog.sh [-h || --help]\n"
+declare -r HELPME3="That's all !\n"
+
+# ask_dir2scan
+declare -r ASKDIR2SCAN1="are you sure ?"
+declare -r ASKDIR2SCAN2="does not exit !"
+
+# choose_db_filename
+declare -r CHOOSEDBFILENAME="Choose a database filename."
+
+# list
+declare -r LISTKNOWNMEDIA="Known media list :"
+
+# search
+declare -r SEARCHWHAT="All or part of the wanted filename.\n -Case sensitive\n -Let empty to a full search"
+
+# main_menu
+declare -r MAINMENU1="Media catalog"
+declare -r MAINMENU2="What to do ?"
+declare -r MAINMENU3="To scan new media"
+declare -r MAINMENU4="To list known media"
+declare -r MAINMENU5="To search a file"
+declare -r MAINMENU6="No media name : abort !"
+
+# main
+declare -r MAINMISSUPDATE="${UPDATEDB} not found ! Package ${YELLOW}mlocate${NORM} missing ?\n"
+declare -r MAINMISSLOCATE="${LOCATE} not found ! Package ${YELLOW}mlocate${NORM} missing ?\n"
+declare -r MAINMISSDIALOG="${DIALOG} not found ! Package ${YELLOW}dialog${NORM} missing ?\n"
+declare -r MAINEXIT="Exit"

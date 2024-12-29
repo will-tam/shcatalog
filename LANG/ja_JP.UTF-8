@@ -1,0 +1,31 @@
+# help_me
+declare -r HELPME1="利用法 :\n"
+declare -r HELPME2="\t\tshcatalog.sh [-h || --help]\n"
+declare -r HELPME3="これだけ ！\n"
+
+# ask_dir2scan
+declare -r ASKDIR2SCAN1="確かでしょうか。"
+declare -r ASKDIR2SCAN2="ないですよ。"
+
+# choose_db_filename
+declare -r CHOOSEDBFILENAME="データベースファイルネームを選択する。"
+
+# list
+declare -r LISTKNOWNMEDIA="既知なメディアリスト ："
+
+# search
+declare -r SEARCHWHAT="全部または半分の探すファルの名前。\n -大/小文字を区別\n -何も入ってないと全部が探される"
+
+# main_menu
+declare -r MAINMENU1="目録メディア"
+declare -r MAINMENU2="何をしましょうか"
+declare -r MAINMENU3="新メディアをスキャンする"
+declare -r MAINMENU4="既知なメディアリストする"
+declare -r MAINMENU5="ファイルを探す"
+declare -r MAINMENU6="メディア名がない　:　断念　！"
+
+# main
+declare -r MAINMISSUPDATE="${UPDATEDB}見つけなかった！${YELLOW}mlocate${NORM}パッケージ不足分か\n"
+declare -r MAINMISSLOCATE="${LOCATE}見つけなかった！${YELLOW}mlocate${NORM}パッケージ不足分か\n"
+declare -r MAINMISSDIALOG="${DIALOG}見つけなかった！${YELLOW}dialog${NORM}パッケージ不足分か\n"
+declare -r MAINEXIT="終わり"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+declare -r DIRFILECLANG="./LANG"
+
 declare -r RED="\033[0;31m"
 declare -r GREEN="\033[0;32m"
 declare -r YELLOW="\033[1;33m"
@@ -22,14 +24,16 @@ declare -r CP="/usr/bin/cp"
 declare -r LS="/usr/bin/ls"
 declare -r SORT="/usr/bin/sort"
 declare -r GREP="/usr/bin/grep"
+declare -r WC="/usr/bin/wc"
+declare -r CUT="/usr/bin/cut"
 declare -r BASENAME="/usr/bin/basename"
 
 
 help_me()
 {
-  echo -e "\nUtilisation :\n"
-  echo -e "\t\tshcatalog.sh [-h || --help]\n"
-  echo -e "C'est tout!\n"
+  echo -e "${HELPME1}"
+  echo -e "${HELPME2}"
+  echo -e "${HELPME3}"
   exit 1
 }
 
@@ -52,9 +56,9 @@ writedbconf()
 
   local -i nb=0
 
-  nb=$(ls -1 ${CONFDIR} | grep -E "$(basename ${CONFDBFILE})(.bak)+" | wc -l)
+  nb=$(${LS} -1 ${CONFDIR} | ${GREP} -E "$(${BASENAME} ${CONFDBFILE})(.bak)+" | ${WC} -l)
   ((nb=nb+1))
-  cp ${CONFDBFILE} ${CONFDBFILE}.bak.${nb}
+  ${CP} ${CONFDBFILE} ${CONFDBFILE}.bak.${nb}
 
   echo "${DBNAME} ${DIR2SCAN}" >> ${CONFDBFILE}
 }
@@ -77,18 +81,18 @@ ask_dir2scan()
 
     if [ -d "${dir2scan}" ]
     then
-      ${DIALOG} --output-fd 1 --no-collapse --yesno "$dir2scan : êtes-vous sûr ?" 0 0
+      ${DIALOG} --output-fd 1 --no-collapse --yesno "$dir2scan : ${ASKDIR2SCAN1}" 0 0
       rc=$?
       [ $rc == 0 ] && break
     else
-      ${DIALOG} --output-fd 1 --no-collapse --msgbox "${dir2scan} n'existe pas !" 0 0
+      ${DIALOG} --output-fd 1 --no-collapse --msgbox "${dir2scan} : ${ASKDIR2SCAN2}" 0 0
     fi
   done
 
   echo "${dir2scan}"
 }
 
-choose_media_name()
+choose_db_filename()
 {
 # Ask for a filename representing the scanned media.
 # $1 = directory to will be scaned.
@@ -98,7 +102,7 @@ choose_media_name()
   media_name=$(${DIALOG}\
     --output-fd 1\
     --no-collapse\
-    --inputbox "Nom du média à scanner (sans espaces) pour ${DIR2SCAN} :" 0 0)
+    --inputbox "${DIR2SCAN} : ${CHOOSEDBFILENAME}" 0 0)
 
   echo "${media_name}"
 }
@@ -123,7 +127,7 @@ list()
   local -r DBLIST=$(while IFS= read -r a b; do printf "%s %s\n" $a $b; done < ${CONFDBFILE})
   local tag=""
 
-  ${DIALOG} --output-fd 1 --no-collapse --nook --menu "Liste des media connus :" 0 0 0 ${DBLIST}
+  ${DIALOG} --output-fd 1 --no-collapse --nook --menu "${LISTKNOWNMEDIA}" 0 0 0 ${DBLIST}
 }
 
 search()
@@ -137,7 +141,7 @@ search()
   filename=$(${DIALOG}\
     --output-fd 1\
     --no-collapse\
-    --inputbox "Nom entier ou partie du fichier à rechercher.\n -Distinction min / MAJ\n -Laisser vide pour tout rechercher" 0 0)
+    --inputbox "${SEARCHWHAT}" 0 0)
 
   [ "x${filename}" == "x" ] && filename="."
 
@@ -159,12 +163,12 @@ main_menu()
   do
     selected=$(${DIALOG}\
       --output-fd 1\
-      --title "Media catalogue"\
-      --menu "Que faire ?"\
+      --title "${MAINMENU1}"\
+      --menu "${MAINMENU2}"\
       0 0 4\
-      "1" "Scanner un nouveau media"\
-      "2" "Lister les medias connus"\
-      "3" "Rechercher un fichier")
+      "1" "${MAINMENU3}"\
+      "2" "${MAINMENU4}"\
+      "3" "${MAINMENU5}")
 
     [ $? -ge 1 ] && break
 
@@ -176,10 +180,10 @@ main_menu()
 
         if [ "x${dir2scan}" != "x" ]
         then
-          media_name="$(choose_media_name ${dir2scan})"
+          media_name="$(choose_db_filename ${dir2scan})"
           if [ "x${media_name}" = "x" ]
           then
-            dialog --output-fd 1 --no-collapse --msgbox "Pas de nom de media : abandon !" 0 0
+            dialog --output-fd 1 --no-collapse --msgbox "${MAINMENU6}" 0 0
           else
             writedbconf "${dir2scan}" "${media_name}"
             scan "${dir2scan}" "${media_name}"
@@ -202,10 +206,21 @@ main_menu()
 
 ######### main
 
+declare MYLANG="$(echo $LANG | ${CUT} -d "." -f 1).UTF-8"
+
+if [ -e ${DIRFILECLANG}/${MYLANG} ]
+then
+  source "${DIRFILECLANG}/${MYLANG}"
+else
+  echo -en "Sorry, file ${YELLOW}${DIRFILECLANG}/${MYLANG}${NORM} not found ! Try to use ${YELLOW}${DIRFILECLANG}/C.UTF-8${NORM}."
+  [ ! -e ${DIRFILECLANG}/C.UTF-8 ] && die_with "LANG failure : ${DIRFILECLANG}/C.UTF-8 does not exist ! Exit with rc 3 !" 3
+  source "${DIRFILECLANG}/C.UTF-8"
+fi
+
 # Some package check
-[ ! -x ${UPDATEDB} ] &&  die_with "${UPDATEDB} non trouvé ! Paquet ${YELLOW}mlocate${NORM} manquant ?\n" 1
-[ ! -x ${LOCATE} ] &&  die_with "${LOCATE} non trouvé ! Paquet ${YELLOW}mlocate${NORM} manquant ?\n" 1
-[ ! -x ${DIALOG} ] &&  die_with "${DIALOG} non trouvé ! Paquet ${YELLOW}dialog${NORM} manquant ?\n" 1
+[ ! -x ${UPDATEDB} ] &&  die_with "${MAINMISSUPDATE}" 3
+[ ! -x ${LOCATE} ] &&  die_with "${MAINMISSLOCATE}" 3
+[ ! -x ${DIALOG} ] &&  die_with "${MAINMISSDIALOG}" 3
 
 # Create using directories if not exist.
 [ ! -d ${CONFDIR} ] && ${MKDIR} -v -p ${CONFDIR}
@@ -216,6 +231,6 @@ main_menu()
 main_menu
 
 clear
-echo "Sortie"
+echo "${MAINEXIT}"
 
 exit 0
