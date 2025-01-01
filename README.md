@@ -1,6 +1,8 @@
 # README
 
-**shcatalog.sh** : text-based interactive media catalog.
+**shcatalog.sh** : only bash text-based interactive media catalog.
+
+Create a list of files within a media as CD, hard drive, USB key, ... to easily find some wanted files on it.
 
 _Will_tam_  - **ver 202501-01**
 
@@ -10,6 +12,8 @@ Choice to use dialog lib instead of whiptail : the venerable dialog has more fea
 -----
 
 # CHANGELOG
+
+  * 2025-01-01 : Read inside a db file, and remove a db file
 
   * 2024-12-29 : Internationnalization : French, Japanses and C(English)
 
@@ -55,7 +59,8 @@ Choice to use dialog lib instead of whiptail : the venerable dialog has more fea
 
 [X] Internationnalisation
 [X] Read inside a db file ?
+[X] Remove a db file ?
 [ ] Nonintereactive to be used by other scripts ?
 [ ] Check if a db file already exist ?
-[ ] Remove a db file ?
+[ ] Clean up shell-script !!!
 

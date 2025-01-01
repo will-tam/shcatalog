@@ -16,13 +16,19 @@ declare -r LISTKNOWNMEDIA="Known media list :"
 # search
 declare -r SEARCHWHAT="All or part of the wanted filename.\n -Case sensitive\n -Let empty to a full search"
 
+# remove_dbfile
+declare -r REMOVEDBFILE1="Are you sure ?"
+declare -r REMOVEDBFILE2=" : deleted !"
+declare -r REMOVEDBFILE3="Canceled !"
+
 # main_menu
 declare -r MAINMENU1="Media catalog"
 declare -r MAINMENU2="What to do ?"
 declare -r MAINMENU3="To scan new media"
 declare -r MAINMENU4="To list known media"
 declare -r MAINMENU5="To search a file"
-declare -r MAINMENU6="No media name : abort !"
+declare -r MAINMENU6="To Delete a file media"
+declare -r MAINMENU7="No media name : abort !"
 
 # main
 declare -r MAINMISSUPDATE="${UPDATEDB} not found ! Package ${YELLOW}mlocate${NORM} missing ?\n"

@@ -16,13 +16,19 @@ declare -r LISTKNOWNMEDIA="Liste des media connus :"
 # search
 declare -r SEARCHWHAT="Nom entier ou partie du nom du fichier à rechercher.\n -Distinction min / MAJ\n -Laisser vide pour tout rechercher"
 
+# remove_dbfile
+declare -r REMOVEDBFILE1="Êtes-vous sûr ?"
+declare -r REMOVEDBFILE2=" : effacé !"
+declare -r REMOVEDBFILE3="Annulé !"
+
 # main_menu
 declare -r MAINMENU1="Media catalogue"
 declare -r MAINMENU2="Que faire ?"
 declare -r MAINMENU3="Scanner un nouveau media"
 declare -r MAINMENU4="Lister les medias connus"
 declare -r MAINMENU5="Rechercher un fichier"
-declare -r MAINMENU6="Pas de nom de media : abandon !"
+declare -r MAINMENU6="Effacer un fichier de media"
+declare -r MAINMENU7="Pas de nom de media : abandon !"
 
 # main
 declare -r MAINMISSUPDATE="${UPDATEDB} non trouvé ! Paquet ${YELLOW}mlocate${NORM} manquant ?\n"

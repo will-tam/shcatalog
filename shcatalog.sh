@@ -27,6 +27,7 @@ declare -r GREP="/usr/bin/grep"
 declare -r WC="/usr/bin/wc"
 declare -r CUT="/usr/bin/cut"
 declare -r SED="/usr/bin/sed"
+declare -r RM="/usr/bin/rm"
 declare -r BASENAME="/usr/bin/basename"
 
 
@@ -47,6 +48,16 @@ die_with()
   exit $2
 }
 
+backup_dbconf()
+{
+# Write a dbconf backup.
+  local -i nb=0
+
+  nb=$(${LS} -1 ${CONFDIR} | ${GREP} -E "$(${BASENAME} ${CONFDBFILE})(.bak)+" | ${WC} -l)
+  ((nb=nb+1))
+  ${CP} ${CONFDBFILE} ${CONFDBFILE}.bak.${nb}
+}
+
 writedbconf()
 {
 # Write db config file
@@ -55,11 +66,7 @@ writedbconf()
   local -r DIR2SCAN="$1"
   local -r DBNAME="$2.db"
 
-  local -i nb=0
-
-  nb=$(${LS} -1 ${CONFDIR} | ${GREP} -E "$(${BASENAME} ${CONFDBFILE})(.bak)+" | ${WC} -l)
-  ((nb=nb+1))
-  ${CP} ${CONFDBFILE} ${CONFDBFILE}.bak.${nb}
+  backup_dbconf
 
   echo "${DBNAME} ${DIR2SCAN}" >> ${CONFDBFILE}
 }
@@ -135,11 +142,10 @@ list_db()
   if [ ${rc} == 0 ]
   then
     echo -e "${tag} :" > ${TMP};
-    ${LOCATE} -d ${LOCALDIR}/${tag} "." | ${SED} -e "s/^/    /" >> ${TMP}
+    ${LOCATE} -d ${DBDIR}/${tag} "." | ${SED} -e "s/^/    /" >> ${TMP}
     ${DIALOG} --no-collapse --textbox ${TMP} 0 0
     echo -e "" > ${TMP}
   fi
-
 }
 
 search()
@@ -164,6 +170,36 @@ search()
   echo -e "" > ${TMP}
 }
 
+remove_dbfile()
+{
+# Remove a choosen dbfile.
+  local -r DBLIST=$(while IFS= read -r a b; do printf "%s %s\n" $a $b; done < ${CONFDBFILE})
+  local rc=0
+  local tag=""
+  local dbfile=""
+
+  tag=$(${DIALOG} --output-fd 1 --no-collapse --menu "${LISTKNOWNMEDIA}" 0 0 0 ${DBLIST})
+  rc=$?
+
+  if [ ${rc} == 0 ]
+  then
+    dbfile="${LOCALDIR}/${tag}"
+
+    ${DIALOG} --output-fd 1 --no-collapse --yesno "${dbfile}\n${REMOVEDBFILE1}" 0 0
+    rc=$?
+    if [ ${rc} == 0 ]
+    then
+      [ -e ${dbfile} ] && ${RM} -v ${dbfile}
+      backup_dbconf
+      ${SED} -i "/${tag}/d" "${CONFDBFILE}"
+      ${DIALOG} --output-fd 1 --no-collapse --msgbox "${dbfile}${REMOVEDBFILE2}" 0 0
+    else
+      ${DIALOG} --output-fd 1 --no-collapse --msgbox "${REMOVEDBFILE3}" 0 0
+    fi
+
+  fi
+}
+
 main_menu()
 {
   local dir2scan=""
@@ -176,10 +212,12 @@ main_menu()
       --output-fd 1\
       --title "${MAINMENU1}"\
       --menu "${MAINMENU2}"\
-      0 0 4\
+      0 0 0\
       "1" "${MAINMENU3}"\
       "2" "${MAINMENU4}"\
-      "3" "${MAINMENU5}")
+      "3" "${MAINMENU5}"\
+      "4" "${MAINMENU6}"
+      )
 
     [ $? -ge 1 ] && break
 
@@ -194,7 +232,7 @@ main_menu()
           media_name="$(choose_db_filename ${dir2scan})"
           if [ "x${media_name}" = "x" ]
           then
-            dialog --output-fd 1 --no-collapse --msgbox "${MAINMENU6}" 0 0
+            ${DIALOG} --output-fd 1 --no-collapse --msgbox "${MAINMENU7}" 0 0
           else
             writedbconf "${dir2scan}" "${media_name}"
             scan "${dir2scan}" "${media_name}"
@@ -207,6 +245,9 @@ main_menu()
       "3")
         search
         ;;
+      "4")
+        remove_dbfile
+        ;;
       *)
       ;;
     esac
@@ -217,7 +258,11 @@ main_menu()
 
 ######### main
 
-declare MYLANG="$(echo $LANG | ${CUT} -d "." -f 1).UTF-8"
+# !!!! To prevent a """bug""" if 'LANG=ja_JP' instead of 'LANG=ja_JP.UTF-8'.
+# Maybe some other non latin langages are also like this. !!!!
+[ "${LANG}" == "ja_JP" ] && LANG="ja_JP.UTF-8"
+
+declare MYLANG="$(echo ${LANG} | ${CUT} -d "." -f 1).UTF-8"
 
 if [ -e ${DIRFILECLANG}/${MYLANG} ]
 then
