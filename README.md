@@ -2,7 +2,7 @@
 
 **shcatalog.sh** : text-based interactive media catalog.
 
-_Will_tam_  - **ver 202412-29**
+_Will_tam_  - **ver 202501-01**
 
 
 Choice to use dialog lib instead of whiptail : the venerable dialog has more feature than the other.
@@ -54,8 +54,8 @@ Choice to use dialog lib instead of whiptail : the venerable dialog has more fea
 # TODO
 
 [X] Internationnalisation
+[X] Read inside a db file ?
 [ ] Nonintereactive to be used by other scripts ?
 [ ] Check if a db file already exist ?
-[ ] Read inside a db file ?
 [ ] Remove a db file ?
 

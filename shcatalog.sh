@@ -26,6 +26,7 @@ declare -r SORT="/usr/bin/sort"
 declare -r GREP="/usr/bin/grep"
 declare -r WC="/usr/bin/wc"
 declare -r CUT="/usr/bin/cut"
+declare -r SED="/usr/bin/sed"
 declare -r BASENAME="/usr/bin/basename"
 
 
@@ -43,7 +44,7 @@ die_with()
 # $1 = String to display why died.
 # $2 = Exit rc > 0.
   echo -en "\n${RED}ERROR${NORM} : $1\n"
-  exit $2  
+  exit $2
 }
 
 writedbconf()
@@ -77,13 +78,13 @@ ask_dir2scan()
       --dselect "${dir2scan}" 25 40)
     rc=$?
 
-    [ $rc -ge 1 ] && break
+    [ ${rc} -ge 1 ] && break
 
     if [ -d "${dir2scan}" ]
     then
       ${DIALOG} --output-fd 1 --no-collapse --yesno "$dir2scan : ${ASKDIR2SCAN1}" 0 0
       rc=$?
-      [ $rc == 0 ] && break
+      [ ${rc} == 0 ] && break
     else
       ${DIALOG} --output-fd 1 --no-collapse --msgbox "${dir2scan} : ${ASKDIR2SCAN2}" 0 0
     fi
@@ -120,14 +121,25 @@ scan()
   ${CP} /dev/null ${TMP}
 }
 
-list()
+list_db()
 {
 # List the whole database files.
   local -r DBDIR="${LOCALDIR}"
   local -r DBLIST=$(while IFS= read -r a b; do printf "%s %s\n" $a $b; done < ${CONFDBFILE})
+  local rc=0
   local tag=""
 
-  ${DIALOG} --output-fd 1 --no-collapse --nook --menu "${LISTKNOWNMEDIA}" 0 0 0 ${DBLIST}
+  tag=$(${DIALOG} --output-fd 1 --no-collapse --menu "${LISTKNOWNMEDIA}" 0 0 0 ${DBLIST})
+  rc=$?
+
+  if [ ${rc} == 0 ]
+  then
+    echo -e "${tag} :" > ${TMP};
+    ${LOCATE} -d ${LOCALDIR}/${tag} "." | ${SED} -e "s/^/    /" >> ${TMP}
+    ${DIALOG} --no-collapse --textbox ${TMP} 0 0
+    echo -e "" > ${TMP}
+  fi
+
 }
 
 search()
@@ -146,8 +158,8 @@ search()
   [ "x${filename}" == "x" ] && filename="."
 
   echo -e "" > ${TMP}
-  for l in $(${LS} -1 ${LOCALDIR}/*.db); do echo -e "${l} :" >> ${TMP}; ${LOCATE} -d $l ${filename} | sed -e "s/^/    /" >> ${TMP}; echo "" >> ${TMP}; done
-  sed -i '$d' ${TMP}
+  for l in $(${LS} -1 ${LOCALDIR}/*.db); do echo -e "${l} :" >> ${TMP}; ${LOCATE} -d ${l} ${filename} | ${SED} -e "s/^/    /" >> ${TMP}; echo "" >> ${TMP}; done
+  ${SED} -i '$d' ${TMP}
   ${DIALOG} --no-collapse --textbox ${TMP} 0 0
   echo -e "" > ${TMP}
 }
@@ -157,8 +169,7 @@ main_menu()
   local dir2scan=""
   local media_name=""
   local selected=0
-  local rc=1
-  
+
   while ${TRUE}
   do
     selected=$(${DIALOG}\
@@ -191,7 +202,7 @@ main_menu()
         fi
         ;;
       "2")
-        list
+        list_db
         ;;
       "3")
         search
