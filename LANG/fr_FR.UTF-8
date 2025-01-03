@@ -7,7 +7,10 @@ declare -r HELPME3="C'est tout !\n"
 declare -r ASKDIR2SCAN1="êtes-vous sûr ?"
 declare -r ASKDIR2SCAN2="n'existe pas !"
 
-# choose_db_filename
+#prepare_2_overwrite
+declare -r P2O="\nÉxiste déjà !\nÉcrasement ?"
+
+# choose_media_filename
 declare -r CHOOSEDBFILENAME="Choisir un nom de fichier base de données."
 
 # list

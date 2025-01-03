@@ -7,7 +7,10 @@ declare -r HELPME3="これだけ ！\n"
 declare -r ASKDIR2SCAN1="確かでしょうか。"
 declare -r ASKDIR2SCAN2="ないですよ。"
 
-# choose_db_filename
+#prepare_2_overwrite
+declare -r P2O="\nすでに存在します !\n上書きですか。"
+
+# choose_media_filename
 declare -r CHOOSEDBFILENAME="データベースファイルネームを選択する。"
 
 # list
@@ -17,8 +20,8 @@ declare -r LISTKNOWNMEDIA="既知なメディアリスト ："
 declare -r SEARCHWHAT="全部または半分の探すファルの名前。\n -大/小文字を区別\n -何も入ってないと全部が探される"
 
 # remove_dbfile
-declare -r REMOVEDBFILE1="本気ですか"
-declare -r REMOVEDBFILE2=" : 消した !"
+declare -r REMOVEDBFILE1="本気ですか。"
+declare -r REMOVEDBFILE2=" : 消しました !"
 declare -r REMOVEDBFILE3="キャンセルしました !"
 
 # main_menu

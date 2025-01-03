@@ -100,7 +100,31 @@ ask_dir2scan()
   echo "${dir2scan}"
 }
 
-choose_db_filename()
+prepare_2_overwrite()
+{
+# Prepare to overwrite if ok for user.
+# $1 = media to overwrite
+  local -r media_name="$1"
+  local -r dbfilename="${LOCALDIR}/${media_name}.db"
+  local media_name_final=""
+  local rc=0
+
+  ${DIALOG} --output-fd 1 --no-collapse --yesno "${dbfilename} ${P2O}" 0 0
+  rc=$?
+  if [ ${rc} == 0 ]
+  then
+    [ -e "${dbfilename}" ] && ${RM} "${dbfilename}"
+    backup_dbconf
+    ${SED} -i "/${media_name}/d" "${CONFDBFILE}"
+    media_name_final=${media_name}
+  else
+    media_name_final=""
+  fi
+
+  echo "${media_name_final}"
+}
+
+choose_media_filename()
 {
 # Ask for a filename representing the scanned media.
 # $1 = directory to will be scaned.
@@ -111,6 +135,8 @@ choose_db_filename()
     --output-fd 1\
     --no-collapse\
     --inputbox "${DIR2SCAN} : ${CHOOSEDBFILENAME}" 0 0)
+
+  [ -e "${LOCALDIR}/${media_name}.db" ] && media_name=$(prepare_2_overwrite "${media_name}")
 
   echo "${media_name}"
 }
@@ -123,8 +149,8 @@ scan()
   local -r DIR2SCAN="$1"
   local -r MEDIANAME="${LOCALDIR}/$2.db"
 
-  ${UPDATEDB} -v -l 0 -U ${DIR2SCAN} -o ${MEDIANAME} | tee ${TMP} | ${DIALOG} --no-collapse --progressbox 25 80
-  ${DIALOG} --no-collapse --textbox ${TMP} 0 0
+  ${UPDATEDB} -v -l 0 -U ${DIR2SCAN} -o ${MEDIANAME} | tee ${TMP} | ${DIALOG} --output-fd 1 --no-collapse --progressbox 25 80
+  ${DIALOG} --output-fd 1 --no-collapse --textbox ${TMP} 0 0
   ${CP} /dev/null ${TMP}
 }
 
@@ -176,23 +202,23 @@ remove_dbfile()
   local -r DBLIST=$(while IFS= read -r a b; do printf "%s %s\n" $a $b; done < ${CONFDBFILE})
   local rc=0
   local tag=""
-  local dbfile=""
+  local dbfilename=""
 
   tag=$(${DIALOG} --output-fd 1 --no-collapse --menu "${LISTKNOWNMEDIA}" 0 0 0 ${DBLIST})
   rc=$?
 
   if [ ${rc} == 0 ]
   then
-    dbfile="${LOCALDIR}/${tag}"
+    dbfilename="${LOCALDIR}/${tag}"
 
-    ${DIALOG} --output-fd 1 --no-collapse --yesno "${dbfile}\n${REMOVEDBFILE1}" 0 0
+    ${DIALOG} --output-fd 1 --no-collapse --yesno "${dbfilename}\n${REMOVEDBFILE1}" 0 0
     rc=$?
     if [ ${rc} == 0 ]
     then
-      [ -e ${dbfile} ] && ${RM} -v ${dbfile}
+      [ -e "${dbfilename}" ] && ${RM} -v "${dbfilename}"
       backup_dbconf
       ${SED} -i "/${tag}/d" "${CONFDBFILE}"
-      ${DIALOG} --output-fd 1 --no-collapse --msgbox "${dbfile}${REMOVEDBFILE2}" 0 0
+      ${DIALOG} --output-fd 1 --no-collapse --msgbox "${dbfilename}${REMOVEDBFILE2}" 0 0
     else
       ${DIALOG} --output-fd 1 --no-collapse --msgbox "${REMOVEDBFILE3}" 0 0
     fi
@@ -226,10 +252,9 @@ main_menu()
         media_name=""
         [ "x${dir2scan}" == "x" ] && dir2scan="/media"
         dir2scan=$(ask_dir2scan "${dir2scan}")
-
         if [ "x${dir2scan}" != "x" ]
         then
-          media_name="$(choose_db_filename ${dir2scan})"
+          media_name="$(choose_media_filename ${dir2scan})"
           if [ "x${media_name}" = "x" ]
           then
             ${DIALOG} --output-fd 1 --no-collapse --msgbox "${MAINMENU7}" 0 0

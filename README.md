@@ -4,7 +4,7 @@
 
 Create a list of files within a media as CD, hard drive, USB key, ... to easily find some wanted files on it.
 
-_Will_tam_  - **ver 202501-01**
+_Will_tam_  - **ver 202501-03**
 
 
 Choice to use dialog lib instead of whiptail : the venerable dialog has more feature than the other.
@@ -12,6 +12,8 @@ Choice to use dialog lib instead of whiptail : the venerable dialog has more fea
 -----
 
 # CHANGELOG
+
+  * 2025-01-01 : Check if a given media db name already exists.
 
   * 2025-01-01 : Read inside a db file, and remove a db file
 
@@ -60,7 +62,6 @@ Choice to use dialog lib instead of whiptail : the venerable dialog has more fea
 [X] Internationnalisation
 [X] Read inside a db file ?
 [X] Remove a db file ?
+[X] Check if a db file already exist ?
 [ ] Nonintereactive to be used by other scripts ?
-[ ] Check if a db file already exist ?
-[ ] Clean up shell-script !!!
-
+[ ] Unused variables clean up shell-script !!!
