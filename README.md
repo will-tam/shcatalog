@@ -13,7 +13,7 @@ Choice to use dialog lib instead of whiptail : the venerable dialog has more fea
 
 # CHANGELOG
 
-  * 2025-01-01 : Check if a given media db name already exists.
+  * 2025-01-03 : Check if a given media db name already exists.
 
   * 2025-01-01 : Read inside a db file, and remove a db file
 
